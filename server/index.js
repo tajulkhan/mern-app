@@ -14,11 +14,10 @@ const app = express();
 app.use(express.json());
 // Middleware to handle CORS for specific domain
 const corsOptions = {
-  origin: "https://taj-mern-stack.netlify.app", // Your frontend domain
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  preflightContinue: false, // Disable preflight on OPTIONS request
-  optionsSuccessStatus: 204, // Status code to return for successful OPTIONS request
+    origin: ['https://taj-mern-stack.netlify.app'],  // Specify the allowed frontend URL(s)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],      // Allow these HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'],  // Allow headers like Content-Type, Authorization (if using tokens)
+    credentials: true,  // Allow cookies and credentials (optional)
 };
 
 app.use(cors(corsOptions));
