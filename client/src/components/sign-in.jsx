@@ -17,7 +17,7 @@ export default function SignIn() {
     }
   
     axios
-      .post("http://localhost:3001/login", { email, password })
+      .post("https://mern-app-1-ukvv.onrender.com/login", { email, password })
       .then((res) => {
         if (res.data.success) {
           sessionStorage.setItem("authToken", res.data.token);

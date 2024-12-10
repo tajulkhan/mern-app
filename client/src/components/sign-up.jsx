@@ -12,7 +12,7 @@ export default function SignUp() {
     e.preventDefault();
     console.log(name, email, password);
     axios
-      .post("http://localhost:3001/register", { name, email, password })
+      .post("https://mern-app-1-ukvv.onrender.com/register", { name, email, password })
       .then((res) => {
         console.log(res)
         navigate('/login');
