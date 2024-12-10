@@ -14,10 +14,17 @@ const app = express();
 app.use(express.json());
 // Allow requests from the specific frontend domain
 const corsOptions = {
-    origin: ['https://taj-mern-stack.netlify.app', 'https://mern-app-1-ukvv.onrender.com'], // Your frontend URL
+    origin: [
+      'https://taj-mern-stack.netlify.app',   // Frontend hosted on Netlify
+      'https://mern-app-1-ukvv.onrender.com'   // Another frontend URL (if necessary)
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'application/json']
+    allowedHeaders: ['Content-Type', 'Authorization', 'application/json'],  // Add Authorization if using tokens
+    credentials: true,  // Allow cookies or credentials (optional but useful if needed)
+    preflightContinue: false,  // Ensure the preflight request continues normally
+    optionsSuccessStatus: 200,  // Some older browsers (IE) may require this
   };
+  
 app.use(cors(corsOptions));
 
 // Connect to MongoDB
