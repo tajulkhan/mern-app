@@ -16,7 +16,7 @@ app.use(express.json());
 const corsOptions = {
     origin: ['https://taj-mern-stack.netlify.app', 'https://mern-app-1-ukvv.onrender.com'], // Your frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'application/json']
   };
 app.use(cors(corsOptions));
 
