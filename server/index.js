@@ -12,7 +12,13 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+// Allow requests from the specific frontend domain
+const corsOptions = {
+    origin: 'https://taj-mern-stack.netlify.app', // Your frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  };
+app.use(cors(corsOptions));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
