@@ -12,8 +12,9 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-
-app.use(cors());
+app.use(cors({
+    origin: 'https://taj-mern-stack.netlify.app',
+}));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
