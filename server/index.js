@@ -9,12 +9,10 @@ const bcrypt = require("bcryptjs");
 const EmployeeModel = require("./models/Employee");
 
 const app = express();
-
+const corsOptions = require('./config/corsOptions');
 // Middleware
 app.use(express.json());
-app.use(cors({
-    origin: 'https://taj-mern-stack.netlify.app',
-}));
+app.use(cors(corsOptions));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
