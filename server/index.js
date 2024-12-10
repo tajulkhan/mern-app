@@ -1,5 +1,5 @@
 // server.js
-require("dotenv").config(); // Load environment variables from .env
+require('dotenv').config();  // Load environment variables from .env
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -12,21 +12,13 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-// Middleware to handle CORS for specific domain
-const corsOptions = {
-    origin: ['https://taj-mern-stack.netlify.app'],  // Specify the allowed frontend URL(s)
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],      // Allow these HTTP methods
-    allowedHeaders: ['Content-Type', 'Authorization'],  // Allow headers like Content-Type, Authorization (if using tokens)
-    credentials: true,  // Allow cookies and credentials (optional)
-};
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); 
+app.use(cors());
+
 // Connect to MongoDB
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-  })
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+})
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log("MongoDB connection error:", err));
 
@@ -39,78 +31,54 @@ const generateToken = (userId) => {
 app.post("/register", (req, res) => {
   const { name, email, password } = req.body;
   bcrypt.hash(password, 10, (err, hashedPassword) => {
-    if (err)
-      return res
-        .status(500)
-        .json({ success: false, message: "Error hashing password" });
+    if (err) return res.status(500).json({ success: false, message: "Error hashing password" });
     EmployeeModel.create({ name, email, password: hashedPassword })
       .then((employee) => res.json({ success: true, employee }))
-      .catch((err) =>
-        res.status(500).json({ success: false, message: err.message })
-      );
+      .catch((err) => res.status(500).json({ success: false, message: err.message }));
   });
 });
 
 // Login Route
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password)
-    return res
-      .status(400)
-      .json({ success: false, message: "Email and password are required" });
+  if (!email || !password) return res.status(400).json({ success: false, message: "Email and password are required" });
 
   EmployeeModel.findOne({ email })
     .then((user) => {
       if (user) {
         bcrypt.compare(password, user.password, (err, isMatch) => {
-          if (err)
-            return res
-              .status(500)
-              .json({ success: false, message: "Error comparing passwords" });
+          if (err) return res.status(500).json({ success: false, message: "Error comparing passwords" });
           if (isMatch) {
             const token = generateToken(user._id);
             res.json({ success: true, token });
           } else {
-            res
-              .status(400)
-              .json({ success: false, message: "Incorrect password" });
+            res.status(400).json({ success: false, message: "Incorrect password" });
           }
         });
       } else {
         res.status(404).json({ success: false, message: "User not found" });
       }
     })
-    .catch((err) =>
-      res.status(500).json({ success: false, message: "Internal server error" })
-    );
+    .catch((err) => res.status(500).json({ success: false, message: "Internal server error" }));
 });
 
 // Middleware to authenticate JWT token (for protected routes)
 const authenticate = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1];
-  if (!token)
-    return res
-      .status(401)
-      .json({ success: false, message: "No token provided" });
+  if (!token) return res.status(401).json({ success: false, message: "No token provided" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decoded.userId;
     next();
   } catch (err) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Invalid or expired token" });
+    return res.status(401).json({ success: false, message: "Invalid or expired token" });
   }
 };
 
 // Example Protected Route
 app.get("/protected", authenticate, (req, res) => {
-  res.json({
-    success: true,
-    message: "This is a protected route",
-    userId: req.userId,
-  });
+  res.json({ success: true, message: "This is a protected route", userId: req.userId });
 });
 
 // Start server
