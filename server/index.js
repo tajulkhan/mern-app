@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 // Allow requests from the specific frontend domain
 const corsOptions = {
-    origin: 'https://taj-mern-stack.netlify.app', // Your frontend URL
+    origin: ['https://taj-mern-stack.netlify.app', 'https://mern-app-1-ukvv.onrender.com'], // Your frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
   };
