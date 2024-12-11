@@ -12,11 +12,14 @@ const app = express();
 const corsOptions = require('./config/corsOptions');
 // Middleware
 app.use(express.json());
-// app.use(cors({
-//   origin:"*",
-//   methods:['GET', 'POST'],
-// }));
-app.use(cors(corsOptions));
+// Allow cross-origin requests from your Netlify frontend
+app.use(cors({
+  origin: 'https://taj-mern-stack.netlify.app', // The domain of your frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  credentials: true,
+}));
+// app.use(cors(corsOptions));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
