@@ -9,15 +9,23 @@ export default function SignIn() {
   const navigate = useNavigate();
   const handleLogin = (event) => {
     event.preventDefault();
-  
+
     // Make sure email and password are non-empty before making the request
     if (!email || !password) {
       alert("Email and password are required.");
       return;
     }
-  
+
     axios
-      .post("https://mern-app-1-ukvv.onrender.com/login", { email, password })
+      .post(
+        "https://mern-app-1-ukvv.onrender.com/login",
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+        { email, password }
+      )
       .then((res) => {
         if (res.data.success) {
           sessionStorage.setItem("authToken", res.data.token);
@@ -27,7 +35,10 @@ export default function SignIn() {
         }
       })
       .catch((err) => {
-        console.error("Error during login:", err.response ? err.response.data : err.message);
+        console.error(
+          "Error during login:",
+          err.response ? err.response.data : err.message
+        );
         alert("Login failed. Please check your credentials.");
       });
   };
@@ -38,7 +49,7 @@ export default function SignIn() {
       navigate("/home");
     }
   }, [navigate]);
-  
+
   return (
     <>
       <div className="flex min-h-full rounded-lg border border-gray-300 flex-1 flex-col justify-center px-6 py-4 lg:px-8">
