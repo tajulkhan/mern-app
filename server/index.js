@@ -12,11 +12,11 @@ const app = express();
 const corsOptions = require('./config/corsOptions');
 // Middleware
 app.use(express.json());
-app.use(cors({
-  origin:"*",
-  methods:['GET', 'POST'],
-}));
-// app.use(cors(corsOptions));
+// app.use(cors({
+//   origin:"*",
+//   methods:['GET', 'POST'],
+// }));
+app.use(cors(corsOptions));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
