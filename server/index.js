@@ -56,8 +56,8 @@ app.post("/register", async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const employee = await EmployeeModel.create({ name, email, password: hashedPassword });
+        // const hashedPassword = await bcrypt.hash(password, 10);
+        const employee = await EmployeeModel.create({ name, email, password });
         res.status(201).json({ success: true, employee });
     } catch (err) {
         console.error("Error during registration:", err);
