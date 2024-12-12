@@ -9,6 +9,9 @@ const EmployeeModel = require("./models/Employee");
 
 const app = express();
 
+// Ensure JWT_SECRET is loaded properly
+console.log('JWT_SECRET:', process.env.JWT_SECRET);  // Debug log
+
 // CORS Options
 const allowedOrigins = [
     'https://taj-mern-stack.netlify.app',
@@ -49,6 +52,9 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Generate JWT Token
 const generateToken = (userId) => {
+    if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET is not defined");
+    }
     return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
 
@@ -95,11 +101,7 @@ app.post("/login", async (req, res) => {
         res.json({ success: true, token });
     } catch (err) {
         console.error("Error during login:", err);
-        if (err instanceof jwt.JsonWebTokenError) {
-            res.status(400).json({ success: false, message: "Invalid JWT token" });
-        } else {
-            res.status(500).json({ success: false, message: "Internal server error" });
-        }
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
 });
 
