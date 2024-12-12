@@ -84,32 +84,32 @@ app.post("/register", async (req, res) => {
 });
 
 // Login Route
-// Login Route
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
+    const { email, password } = req.body;
+  
+    try {
       if (!email || !password) {
-          return res.status(400).json({ success: false, message: "Email and password are required" });
+        return res.status(400).json({ success: false, message: "Email and password are required" });
       }
-
+  
       const user = await EmployeeModel.findOne({ email });
       if (!user) {
-          return res.status(404).json({ success: false, message: "User not found" });
+        return res.status(404).json({ success: false, message: "User not found" });
       }
-
-      // Directly compare password (not recommended for production)
-      if (user.password !== password) {
-          return res.status(400).json({ success: false, message: "Incorrect password" });
+  
+      // Compare the hashed password with the provided password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ success: false, message: "Incorrect password" });
       }
-
+  
       const token = generateToken(user._id);
       res.json({ success: true, token });
-  } catch (err) {
+    } catch (err) {
       console.error("Error during login:", err);
       res.status(500).json({ success: false, message: "Internal server error" });
-  }
-});
+    }
+  });
 
 
 // app.post("/login", async (req, res) => {

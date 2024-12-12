@@ -9,13 +9,14 @@ export default function SignIn() {
   const navigate = useNavigate();
   const handleLogin = (event) => {
     event.preventDefault();
-  
-    // Make sure email and password are non-empty before making the request
+    
     if (!email || !password) {
       alert("Email and password are required.");
       return;
     }
-  
+    
+    console.log("Attempting login with password:", password);  // Debugging line
+    
     axios
       .post("https://mern-app-1-ukvv.onrender.com/login", { email, password })
       .then((res) => {
