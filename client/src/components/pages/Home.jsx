@@ -25,6 +25,7 @@ export default function Home() {
       // Make a request to fetch user data or protected content
       axios
         .get("https://mern-app-1-ukvv.onrender.com/protected", {
+        // .get("http://localhost:3001/protected", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setMessage(res.data.message))
