@@ -18,38 +18,26 @@ const allowedOrigins = [
 
 const corsOptions = {
     origin: (origin, callback) => {
-        console.log(`Origin: ${origin}`);
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        console.log(`Received CORS request from origin: ${origin}`);
+        if (!origin || allowedOrigins.includes(origin)) {
             console.log('CORS allowed');
             callback(null, true);
         } else {
-            console.log('CORS blocked');
+            console.log('CORS blocked for this origin');
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true, // Allow cookies and other credentials
+    credentials: true, // Allow credentials (cookies, etc.)
     optionsSuccessStatus: 200, // For legacy browsers
 };
 
-// Middleware
 app.use(express.json());
 app.use(cors(corsOptions)); // Apply CORS middleware
 
-// Log all incoming requests (for debugging)
-app.use((req, res, next) => {
-    console.log(`Incoming request: ${req.method} ${req.url}`);
-    next();
-});
-
-// Connect to MongoDB
-// mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-//     .then(() => console.log("MongoDB connected"))
-//     .catch((err) => console.error("MongoDB connection error:", err));
-
-// Connect to MongoDB
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI, { 
-  useNewUrlParser: true, 
-  useUnifiedTopology: true 
+    useNewUrlParser: true, 
+    useUnifiedTopology: true 
 })
   .then(() => {
       console.log("MongoDB connected successfully");
@@ -58,11 +46,6 @@ mongoose.connect(process.env.MONGO_URI, {
       console.error("MongoDB connection error:", err.message);
       process.exit(1);  // Exit process with failure
   });
-
-// Optional: Add listeners to handle specific MongoDB connection events
-mongoose.connection.on('connected', () => {
-  console.log('Mongoose connected to the database');
-});
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -74,8 +57,14 @@ app.post("/register", async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
-        // const hashedPassword = await bcrypt.hash(password, 10);
-        const employee = await EmployeeModel.create({ name, email, password });
+        const existingUser = await EmployeeModel.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: "Email already in use" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const employee = await EmployeeModel.create({ name, email, password: hashedPassword });
+
         res.status(201).json({ success: true, employee });
     } catch (err) {
         console.error("Error during registration:", err);
@@ -86,57 +75,33 @@ app.post("/register", async (req, res) => {
 // Login Route
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
-  
+
     try {
-      if (!email || !password) {
-        return res.status(400).json({ success: false, message: "Email and password are required" });
-      }
-  
-      const user = await EmployeeModel.findOne({ email });
-      if (!user) {
-        return res.status(404).json({ success: false, message: "User not found" });
-      }
-  
-      // Compare the hashed password with the provided password
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(400).json({ success: false, message: "Incorrect password" });
-      }
-  
-      const token = generateToken(user._id);
-      res.json({ success: true, token });
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: "Email and password are required" });
+        }
+
+        const user = await EmployeeModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ success: false, message: "Incorrect password" });
+        }
+
+        const token = generateToken(user._id);
+        res.json({ success: true, token });
     } catch (err) {
-      console.error("Error during login:", err);
-      res.status(500).json({ success: false, message: "Internal server error" });
+        console.error("Error during login:", err);
+        if (err instanceof jwt.JsonWebTokenError) {
+            res.status(400).json({ success: false, message: "Invalid JWT token" });
+        } else {
+            res.status(500).json({ success: false, message: "Internal server error" });
+        }
     }
-  });
-
-
-// app.post("/login", async (req, res) => {
-//     const { email, password } = req.body;
-
-//     try {
-//         if (!email || !password) {
-//             return res.status(400).json({ success: false, message: "Email and password are required" });
-//         }
-
-//         const user = await EmployeeModel.findOne({ email });
-//         if (!user) {
-//             return res.status(404).json({ success: false, message: "User not found" });
-//         }
-
-//         const isMatch = await bcrypt.compare(password, user.password);
-//         if (!isMatch) {
-//             return res.status(400).json({ success: false, message: "Incorrect password" });
-//         }
-
-//         const token = generateToken(user._id);
-//         res.json({ success: true, token });
-//     } catch (err) {
-//         console.error("Error during login:", err);
-//         res.status(500).json({ success: false, message: "Internal server error" });
-//     }
-// });
+});
 
 // Middleware to authenticate JWT token
 const authenticate = (req, res, next) => {
@@ -155,13 +120,15 @@ const authenticate = (req, res, next) => {
     }
 };
 
-// Example Protected Route
+// Protected Route Example
 app.get("/protected", authenticate, (req, res) => {
     res.json({ success: true, message: "This is a protected route", userId: req.userId });
 });
 
-// Handle preflight requests
-app.options('*', cors(corsOptions));
+// Logout Route
+app.post("/logout", (req, res) => {
+    res.json({ success: true, message: "You have logged out" });
+});
 
 // Start server
 const port = process.env.PORT || 3001;
