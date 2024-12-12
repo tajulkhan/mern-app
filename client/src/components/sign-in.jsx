@@ -6,30 +6,36 @@ import { useNavigate } from "react-router-dom";
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); 
   const navigate = useNavigate();
   const handleLogin = (event) => {
     event.preventDefault();
-    
+
     if (!email || !password) {
       alert("Email and password are required.");
       return;
     }
-    
-    console.log("Attempting login with password:", password);  // Debugging line
-    
+    setIsLoading(true); // Start loading
     axios
       .post("https://mern-app-1-ukvv.onrender.com/login", { email, password })
       // .post("http://localhost:3001/login", { email, password })
       .then((res) => {
+        setIsLoading(false);
         if (res.data.success) {
           sessionStorage.setItem("authToken", res.data.token);
-          navigate("/home");
+          setIsAuthenticated(true);
+          // navigate("/home");
         } else {
           alert("Login failed: " + res.data.message);
         }
       })
       .catch((err) => {
-        console.error("Error during login:", err.response ? err.response.data : err.message);
+        setIsLoading(false);
+        console.error(
+          "Error during login:",
+          err.response ? err.response.data : err.message
+        );
         alert("Login failed. Please check your credentials.");
       });
   };
@@ -37,10 +43,17 @@ export default function SignIn() {
     // If the user is already authenticated, redirect to home page
     const token = sessionStorage.getItem("authToken");
     if (token) {
+      setIsAuthenticated(true); // User is already authenticated
+    }
+  }, []); // Run only once after the initial render
+
+  useEffect(() => {
+    // Redirect to home if authenticated
+    if (isAuthenticated) {
       navigate("/home");
     }
-  }, [navigate]);
-  
+  }, [isAuthenticated, navigate]);
+
   return (
     <>
       <div className="flex min-h-full rounded-lg border border-gray-300 flex-1 flex-col justify-center px-6 py-4 lg:px-8">
@@ -106,10 +119,35 @@ export default function SignIn() {
 
             <div>
               <button
+                disabled={isLoading}
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-green-700 px-3 py-1.5 text-sm/6 font-semibold hover:border-1 hover:border-green-500 text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
               >
-                Sign in
+                {isLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 mr-3"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="none"
+                        d="M4 12a8 8 0 118 8 8 8 0 01-8-8zm12 0a8 8 0 11-8 8 8 8 0 018-8z"
+                      />
+                    </svg>
+                    Processing...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </button>
             </div>
           </form>
