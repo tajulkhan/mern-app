@@ -16,7 +16,7 @@ export default function SignIn() {
       alert("Email and password are required.");
       return;
     }
-    setIsLoading(true); // Start loading
+    setIsLoading(true); 
     axios
       .post("https://mern-app-1-ukvv.onrender.com/login", { email, password })
       // .post("http://localhost:3001/login", { email, password })
@@ -25,7 +25,6 @@ export default function SignIn() {
         if (res.data.success) {
           sessionStorage.setItem("authToken", res.data.token);
           setIsAuthenticated(true);
-          // navigate("/home");
         } else {
           alert("Login failed: " + res.data.message);
         }
@@ -40,15 +39,13 @@ export default function SignIn() {
       });
   };
   useEffect(() => {
-    // If the user is already authenticated, redirect to home page
     const token = sessionStorage.getItem("authToken");
     if (token) {
-      setIsAuthenticated(true); // User is already authenticated
+      setIsAuthenticated(true); 
     }
-  }, []); // Run only once after the initial render
+  }, []); 
 
   useEffect(() => {
-    // Redirect to home if authenticated
     if (isAuthenticated) {
       navigate("/home");
     }

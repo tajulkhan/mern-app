@@ -9,7 +9,6 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if there's a token in localStorage
     const token = sessionStorage.getItem("authToken");
     if (token) {
       setIsAuthenticated(true);
@@ -19,15 +18,14 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter> {/* Make sure BrowserRouter is wrapping the entire app */}
+    <BrowserRouter> 
       <Routes>
-        {/* Root route ("/") */}
         <Route path="/" element={isAuthenticated ? <Home /> : <SignIn />} /> 
         <Route path="/register" element={<SignUp />} />
         <Route path="/login" element={<SignIn />} />
         <Route 
           path="/home" 
-          element={isAuthenticated ? <Home /> : <SignIn />}  // Protect route with auth check
+          element={isAuthenticated ? <Home /> : <SignIn />}  
         />
       </Routes>
     </BrowserRouter>

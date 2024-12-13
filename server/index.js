@@ -8,9 +8,8 @@ const bcrypt = require("bcryptjs");
 const EmployeeModel = require("./models/Employee");
 
 const app = express();
-
-// Ensure JWT_SECRET is loaded properly
-console.log('JWT_SECRET:', process.env.JWT_SECRET);  // Debug log
+// Debug log
+console.log('JWT_SECRET:', process.env.JWT_SECRET);  
 
 // CORS Options
 const allowedOrigins = [
