@@ -50,11 +50,11 @@ mongoose.connect(process.env.MONGO_URI, {
   });
 
 // Generate JWT Token
-const generateToken = (userId) => {
+const generateToken = (userId, name) => {
     if (!process.env.JWT_SECRET) {
         throw new Error("JWT_SECRET is not defined");
     }
-    return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    return jwt.sign({ userId, name }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
 
 // Register Route
@@ -96,7 +96,7 @@ app.post("/login", async (req, res) => {
             return res.status(400).json({ success: false, message: "Incorrect password" });
         }
 
-        const token = generateToken(user._id);
+        const token = generateToken(user._id, user.name);
         res.json({ success: true, token });
     } catch (err) {
         console.error("Error during login:", err);
@@ -114,6 +114,7 @@ const authenticate = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.userId;
+        req.userName = decoded.name;
         next();
     } catch (err) {
         console.error("Invalid or expired token:", err);
@@ -123,7 +124,7 @@ const authenticate = (req, res, next) => {
 
 // Protected Route Example
 app.get("/protected", authenticate, (req, res) => {
-    res.json({ success: true, message: "This is a protected route", userId: req.userId });
+    res.json({ success: true, message: "This is a protected route", userId: req.userId, userName: req.userName  });
 });
 
 // Logout Route

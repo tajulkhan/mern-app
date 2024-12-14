@@ -7,13 +7,15 @@ export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const apiUrl = "http://localhost:3001";
+  // const apiUrl = "https://mern-app-1-ukvv.onrender.com";
   const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(name, email, password);
     axios
-      .post("https://mern-app-1-ukvv.onrender.com/register", { name, email, password })
-      // .post("http://localhost:3001/register", { name, email, password })
+      // .post("https://mern-app-1-ukvv.onrender.com/register", { name, email, password })
+      .post(`${apiUrl}/register`, { name, email, password })
       .then((res) => {
         console.log(res)
         navigate('/login');
