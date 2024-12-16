@@ -6,8 +6,8 @@ export default function Home() {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [name, setName]=useState("");
-  const apiUrl = "http://localhost:3001";
-  // const apiUrl = "https://mern-app-1-ukvv.onrender.com";
+  // const apiUrl = "http://localhost:3001";
+  const apiUrl = "https://mern-app-1-ukvv.onrender.com";
   const logOut = () => {
     console.log("Logging out...");
     sessionStorage.removeItem("authToken");

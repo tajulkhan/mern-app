@@ -9,10 +9,12 @@ export default function SignIn() {
   const navigate = useNavigate();
 
   // Use Vite environment variables correctly
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
+  // const apiUrl = import.meta.env.MONGO_URI || "http://localhost:3001";
+  const apiUrl = "https://mern-app-1-ukvv.onrender.com";
+
 
   // Handle the login form submission
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
 
     if (!email || !password) {
@@ -22,32 +24,32 @@ export default function SignIn() {
 
     setIsLoading(true);
 
-    axios
-      .post(`${apiUrl}/login`, { email, password })
-      .then((res) => {
-        setIsLoading(false);
-        if (res.data.success) {
-          sessionStorage.setItem("authToken", res.data.token);
-          // After successful login, navigate to the home page
-          navigate("/home", { replace: true });
-        } else {
-          alert("Login failed: " + res.data.message);
-        }
-      })
-      .catch((err) => {
-        setIsLoading(false);
-        console.error("Error during login:", err.response ? err.response.data : err.message);
-        alert("Login failed. Please check your credentials.");
-      });
+    try {
+      const res = await axios.post(`${apiUrl}/login`, { email, password });
+      setIsLoading(false);
+
+      if (res.data.success) {
+        // Store token in sessionStorage and immediately navigate
+        sessionStorage.setItem("authToken", res.data.token);
+        navigate("/home", { replace: true }); // Redirect to home page immediately after successful login
+      } else {
+        alert("Login failed: " + res.data.message);
+      }
+    } catch (err) {
+      setIsLoading(false);
+      console.error("Error during login:", err.response ? err.response.data : err.message);
+      alert("Login failed. Please check your credentials.");
+    }
   };
 
   // Check if the user is already authenticated when the component mounts
   useEffect(() => {
     const token = sessionStorage.getItem("authToken");
     if (token) {
-      navigate("/home", { replace: true }); // Redirect to home if already authenticated
+      // If a token exists, navigate to home page immediately
+      navigate("/home", { replace: true });
     }
-  }, [navigate]); // Dependency array ensures this effect runs only once when the component mounts
+  }, [navigate]); // Dependency array ensures this runs only once when the component mounts
 
   return (
     <div className="flex min-h-full rounded-lg border border-gray-300 flex-1 flex-col justify-center px-6 py-4 lg:px-8">

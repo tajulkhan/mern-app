@@ -7,8 +7,8 @@ export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const apiUrl = "http://localhost:3001";
-  // const apiUrl = "https://mern-app-1-ukvv.onrender.com";
+  // const apiUrl = "http://localhost:3001";
+  const apiUrl = "https://mern-app-1-ukvv.onrender.com";
   const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
