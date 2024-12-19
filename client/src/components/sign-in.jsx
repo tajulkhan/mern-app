@@ -8,7 +8,9 @@ export default function SignIn() {
   const [isLoadingPopup, setIsLoadingPopup] = useState(false);
   const navigate = useNavigate();
 
-  const apiUrl = "http://localhost:3001"; // Change this if using production API
+  // const apiUrl = "http://localhost:3001"; // Change this if using production API
+  const apiUrl = "https://mern-app-1-ukvv.onrender.com";
+
 
   const handleLogin = async (event) => {
     event.preventDefault();
