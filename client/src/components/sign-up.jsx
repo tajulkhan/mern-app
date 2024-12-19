@@ -7,20 +7,24 @@ export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const apiUrl = "http://localhost:3001";
-  const apiUrl = "https://mern-app-1-ukvv.onrender.com";
+  const [isLoadingPopup, setIsLoadingPopup] = useState(false);
+  const apiUrl = "http://localhost:3001";
+  // const apiUrl = "https://mern-app-1-ukvv.onrender.com";
   const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(name, email, password);
+    setIsLoadingPopup(true);
     axios
-      // .post("https://mern-app-1-ukvv.onrender.com/register", { name, email, password })
       .post(`${apiUrl}/register`, { name, email, password })
       .then((res) => {
-        console.log(res)
-        navigate('/login');
+        console.log(res);
+        navigate("/login");
       })
-      .catch((err) => console.log("APi ", err));
+      .catch((err) => {
+        setIsLoadingPopup(false); 
+        console.log("APi ", err);
+      });
   };
   return (
     <>
@@ -116,6 +120,20 @@ export default function SignUp() {
             </Link>
           </p>
         </div>
+        {/* Loader Popup */}
+        {isLoadingPopup && (
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+            <div className="bg-white p-8 rounded-md">
+              <div className="flex justify-center items-center space-x-2">
+                <div
+                  className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                  role="status"
+                ></div>
+                <span className="text-lg text-gray-800">Loading...</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

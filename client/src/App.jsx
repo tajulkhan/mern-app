@@ -1,32 +1,43 @@
-import './App.css';
+import { useState, useEffect } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import SignIn from './components/sign-in';
 import SignUp from './components/sign-up';
 import Home from './components/pages/Home';
-import { BrowserRouter, Routes, Route } from 'react-router-dom'; 
-import { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("authToken");
+    const token = localStorage.getItem("authToken");
     if (token) {
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
     }
-  }, []); // This is fine for checking token on initial load
+  }, []);
 
-  return (
-    <BrowserRouter> 
-      <Routes>
-        <Route path="/" element={isAuthenticated ? <Home /> : <SignIn />} /> 
-        <Route path="/register" element={<SignUp />} />
-        <Route path="/login" element={<SignIn />} />
-        <Route path="/home" element={isAuthenticated ? <Home /> : <SignIn />} />
-      </Routes>
-    </BrowserRouter>
-  );
+  // Define the routes using `createBrowserRouter`
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: isAuthenticated ? <Home /> : <SignIn />,
+    },
+    {
+      path: "/register",
+      element: <SignUp />,
+    },
+    {
+      path: "/login",
+      element: <SignIn />,
+    },
+    {
+      path: "/home",
+      element: isAuthenticated ? <Home /> : <SignIn />,
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
 }
 
 export default App;
